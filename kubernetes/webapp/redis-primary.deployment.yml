@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: gcr.io/google_containers/redis:e2e  # or just image: redis
+        image: redis:7-alpine
         resources:
           requests:
             cpu: 100m

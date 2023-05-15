@@ -2,7 +2,13 @@ resource "aws_instance" "web_host" {
   # ec2 have plain text secrets in user data
   ami           = "${var.ami}"
   instance_type = "t2.nano"
-
+  metadata_options {
+      http_endpoint = "enabled"
+      http_tokens   = "required"
+  }
+  root_block_device {
+  encrypted     = true
+  }
   vpc_security_group_ids = [
   "${aws_security_group.web-node.id}"]
   subnet_id = "${aws_subnet.web_subnet.id}"
@@ -10,8 +16,6 @@ resource "aws_instance" "web_host" {
 #! /bin/bash
 sudo apt-get update
 sudo apt-get install -y jq
-export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMAAA
-export AWS_SECRET_ACCESS_KEY=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
 export AWS_DEFAULT_REGION=us-west-2
 EOF
   tags = {
@@ -23,7 +27,7 @@ EOF
 resource "aws_ebs_volume" "web_host_storage" {
   # unencrypted volume
   availability_zone = "${var.availability_zone}"
-  #encrypted         = false  # Setting this causes the volume to be recreated on apply 
+  encrypted         = true  # Setting this causes the volume to be recreated on apply 
   size = 1
   tags = {
     Name                 = "${local.resource_prefix.value}-ebs"
@@ -171,7 +175,6 @@ resource "aws_s3_bucket" "flowbucket" {
     Environment          = local.resource_prefix.value
     git_file             = "terraform/aws/bastion.tf"
   }
-  acl = "public-read"
   versioning {
     enabled = false
   }  

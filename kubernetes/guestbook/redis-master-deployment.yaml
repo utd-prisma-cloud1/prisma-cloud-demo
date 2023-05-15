@@ -19,13 +19,13 @@ spec:
     spec:
       containers:
       - name: redis-master
-        securityContext:
-          allowPrivilegeEscalation: true
-          capabilities:
-            add: ["AUDIT_CONTROL"]
-          privileged: true
-          readOnlyRootFilesystem: false        
-        image: redis:3.2.9
+        #securityContext:
+          #allowPrivilegeEscalation: true
+          #capabilities:
+          #  add: ["AUDIT_CONTROL"]
+          #privileged: true
+          #readOnlyRootFilesystem: false        
+        image: redis:7-alpine
         ports:
         - name: redis-server
           containerPort: 6379

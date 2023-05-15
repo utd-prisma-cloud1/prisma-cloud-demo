@@ -16,14 +16,7 @@ spec:
     spec:
       containers:
         - name: webapp
-          image: us-central1-docker.pkg.dev/panw-utd-public-cloud/utd-demo-images/utd-cnsp/webapp:v1
-          securityContext:
-            allowPrivilegeEscalation: true
-            capabilities:
-              add: ["AUDIT_CONTROL"]
-            privileged: true
-            readOnlyRootFilesystem: false    
-
+          image: us-central1-docker.pkg.dev/panw-utd-public-cloud/utd-demo-images/utd-cnsp/webapp:v2
           command: ["ruby", "app/app.rb"]
           imagePullPolicy: IfNotPresent
           livenessProbe:

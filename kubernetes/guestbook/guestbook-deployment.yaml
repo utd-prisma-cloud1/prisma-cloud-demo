@@ -24,7 +24,7 @@ spec:
       hostNetwork: true        
       containers:
       - name: guestbook
-        image: us-central1-docker.pkg.dev/panw-utd-public-cloud/utd-demo-images/utd-cnsp/guestbook:v1
+        image: us-central1-docker.pkg.dev/panw-utd-public-cloud/utd-demo-images/utd-cnsp/guestbook:v2
         ports:
         - name: http-server
           containerPort: 3000
