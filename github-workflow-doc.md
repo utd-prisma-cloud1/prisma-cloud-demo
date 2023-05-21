@@ -18,11 +18,14 @@ The workflow consists of multipls jobs, each with its steps:
 5. **kubernetesManifests**: This job generates a matrix of all Kubernetes code directories in the `kubernetes/` directory. The matrix is passed to the next job to scan Kubernetes manifests.
 6. **kubernetes-scan**: This job runs Bridgecrew to scan the Kubernetes manifests using Prisma Cloud. The scan results are saved in SARIF and console formats.
 
-## Prerequisites
-The workflow requires the following prerequisites:
+## Required Workflow Secrets
+Below are the secrets that are passed as variables to this Github Action:
+- **DOCKERHUB_TOKEN:** Dockerhub personal access token
+- **PCC_CONSOLE_URL:** Prisma Cloud Compute URL
+- **PCC_ACCESS_KEY_ID:** Prisma Cloud Access Key ID
+- **PCC_SECRET_ACCESS_KEY:** Prisma Cloud Secret Access Key
+- **PC_API_KEY:** Prsima Cloud Access Key ID and Secret Key in the format `<PCC_SECRET_ACCESS_KEY>::<PC_API_KEY>`
 
-- Prisma Cloud Compute
-- A Prisma Cloud access key ID and secret access key
 
 ## Workflow Details
 ### Prisma Cloud IaC Full Scan
