@@ -1,0 +1,137 @@
+name: Prisma Cloud IaC Full Scan
+on:
+  pull_request:
+    branches:
+      - 'main'
+jobs:
+  dockerImages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate matrix with all modules of this repository
+        id: set-matrix
+        run: |
+          echo "matrix=$(ls -l docker-images/ | grep '^d' | awk -F ' ' '{print $9}' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  docker-image-scan:
+    needs: dockerImages
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJson(needs.dockerImages.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Run Docker build
+      - name: Docker Build
+        run: |
+          docker build -t ultimate-test-drive/${{ matrix.path }}:latest -t ultimate-test-drive/${{ matrix.path }}:${{ github.run_number }} -f ${{ github.workspace }}/docker-images/${{ matrix.path }}/Dockerfile ${{ github.workspace }}/docker-images/${{ matrix.path }}
+        shell: bash {0}
+
+      # Run Prisma Cloud Image scan
+      - name: Prisma Cloud image scan
+        id: scan
+        uses: PaloAltoNetworks/prisma-cloud-scan@v1
+        with:
+          pcc_console_url: ${{ secrets.PCC_CONSOLE_URL }}
+          pcc_user: ${{ secrets.PCC_ACCESS_KEY_ID }}
+          pcc_pass: ${{ secrets.PCC_SECRET_ACCESS_KEY }}
+          image_name: ultimate-test-drive/${{ matrix.path }}:latest
+
+      # Runs twistcli sandbox
+      - name: Run twistcli sandbox
+        run: |
+          if [ ${{ matrix.path }} = "ubuntu" ]; then
+            curl -s https://utd-packages.s3.amazonaws.com/twistcli --output twistcli
+            chmod +x twistcli
+            sudo ./twistcli sandbox --address ${{ secrets.PCC_CONSOLE_URL }} --user ${{ secrets.PCC_ACCESS_KEY_ID }} --password ${{ secrets.PCC_SECRET_ACCESS_KEY }} --analysis-duration 2m ultimate-test-drive/${{ matrix.path }}:latest
+          else
+            echo "Skipping Sandbox analysis for Whitelisted image: ${{ matrix.path }}"
+          fi
+
+  terraformCode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate matrix1 with all Terraform code dirs of this repository
+        id: terraform
+        run: |
+          echo "matrix=$(ls -l terraform/ | grep '^d' | awk -F ' ' '{print $9}' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.terraform.outputs.matrix }}
+
+  terraform-scan:
+    needs: terraformCode
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJson(needs.terraformCode.outputs.matrix) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Run IaC scan on Terraform code
+      - name: Run Bridgecrew
+        id: Bridgecrew
+        uses: bridgecrewio/bridgecrew-action@master
+        env:
+          PRISMA_API_URL: https://api4.prismacloud.io
+        with:
+          api-key: ${{ secrets.PC_API_KEY }}
+          directory: "${{ github.workspace }}/terraform/${{ matrix.path }}"
+          soft_fail: false
+          framework: terraform
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+          quiet: true
+          download_external_modules: true
+          log_level: WARNING
+          check: CRITICAL,HIGH
+
+  kubernetesManifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate matrix1 with all kubernetes code dirs of this repository
+        id: kubernetes
+        run: |
+          echo "matrix=$(ls -l kubernetes/ | grep '^d' | awk -F ' ' '{print $9}' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.kubernetes.outputs.matrix }}
+
+  kubernetes-scan:
+    needs: kubernetesManifests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJson(needs.kubernetesManifests.outputs.matrix) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Run IaC scan on Kubernetes manifests
+      - name: Run Bridgecrew
+        id: Bridgecrew
+        uses: bridgecrewio/bridgecrew-action@master
+        env:
+          PRISMA_API_URL: https://api4.prismacloud.io
+        with:
+          api-key: ${{ secrets.PC_API_KEY }}
+          directory: "${{ github.workspace }}/kubernetes/${{ matrix.path }}"
+          soft_fail: false
+          framework: kubernetes
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+          quiet: true
+          download_external_modules: true
+          log_level: WARNING
+          skip_check: LOW,MEDIUM
+          check: CKV_K8S*
