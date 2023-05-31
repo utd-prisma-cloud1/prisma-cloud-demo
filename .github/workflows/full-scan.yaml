@@ -131,7 +131,6 @@ jobs:
           output_format: cli,sarif
           output_file_path: console,results.sarif
           quiet: true
-          download_external_modules: true
           log_level: WARNING
           skip_check: LOW,MEDIUM
           check: CKV_K8S*
