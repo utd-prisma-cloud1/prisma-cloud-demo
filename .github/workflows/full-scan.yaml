@@ -83,7 +83,7 @@ jobs:
         env:
           PRISMA_API_URL: https://api4.prismacloud.io
         with:
-          api-key: ${{ secrets.BC_API_KEY }}
+          api-key: ${{ secrets.PC_API_KEY }}
           directory: "${{ github.workspace }}/terraform/${{ matrix.path }}"
           soft_fail: false
           framework: terraform
@@ -124,7 +124,7 @@ jobs:
         env:
           PRISMA_API_URL: https://api4.prismacloud.io
         with:
-          api-key: ${{ secrets.BC_API_KEY }}
+          api-key: ${{ secrets.PC_API_KEY }}
           directory: "${{ github.workspace }}/kubernetes/${{ matrix.path }}"
           soft_fail: false
           framework: kubernetes
@@ -134,4 +134,3 @@ jobs:
           log_level: WARNING
           skip_check: LOW,MEDIUM
           check: CKV_K8S*
-
