@@ -8,7 +8,7 @@ The repository has 3 main folders: Terraform, DockerImages and Kubernetes and co
 
 **Note**: The code isn't production ready and is intentionally misconfigured. This is only for demonstration purposes.
 
-## Purpose
+## Purpose:
 
 The Github Actions workflow in this repo is designed to perform Prisma Cloud Scans on:
 - Code to build Docker images
