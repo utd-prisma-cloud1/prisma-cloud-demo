@@ -1,4 +1,3 @@
-
 # Github Actions for Prisma Cloud IaC Full Scan
 
 This is a Github Actions workflow to perform Prisma Cloud Scans on:
