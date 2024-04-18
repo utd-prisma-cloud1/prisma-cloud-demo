@@ -7,7 +7,7 @@ jobs:
   dockerImages:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Generate matrix with all modules of this repository
         id: set-matrix
         run: |
@@ -24,7 +24,7 @@ jobs:
         path: ${{ fromJson(needs.dockerImages.outputs.matrix) }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Run Docker build
       - name: Docker Build
@@ -56,7 +56,7 @@ jobs:
   terraformCode:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Generate matrix1 with all Terraform code dirs of this repository
         id: terraform
         run: |
@@ -97,7 +97,7 @@ jobs:
   kubernetesManifests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Generate matrix1 with all kubernetes code dirs of this repository
         id: kubernetes
         run: |
@@ -115,7 +115,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Run IaC scan on Kubernetes manifests
       - name: Run Bridgecrew
