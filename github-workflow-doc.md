@@ -5,7 +5,7 @@ This is a Github Actions workflow to perform Prisma Cloud Scans on:
 - Terraform code
 - Kubernetes manifests
 
-The idea is to bring all the components of Prisma Cloud Scan together (Twistcli image scan, Twistcli sandbox scan and Bridgecrew scan) to scan differnt pieces of IaC in the same CICD run.
+The idea is to bring all the components of Prisma Cloud Scan together (Twistcli image scan, Twistcli sandbox scan and Bridgecrew scan) to scan differnt types of IaC in the same CICD run.
 
 ## Workflow Overview
 The workflow consists of multipls jobs, each with its steps:
