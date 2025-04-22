@@ -1,4 +1,3 @@
-
 FROM golang:1.11.1 as builder
 
 # Install required system dependencies
@@ -16,25 +15,21 @@ RUN git clone https://github.com/codegangsta/negroni.git $GOPATH/src/github.com/
 
 RUN git clone https://github.com/gorilla/mux.git $GOPATH/src/github.com/gorilla/mux && \
     cd $GOPATH/src/github.com/gorilla/mux && \
-    git checkout v1.7.3  # Last version before Go 1.18+ features
+    git checkout v1.7.3  # Fixed version
 
 RUN git clone https://gitlab.com/utd-admin/simpleredis.git $GOPATH/src/gitlab.com/utd-admin/simpleredis && \
     cd $GOPATH/src/gitlab.com/utd-admin/simpleredis && \
-    git checkout main
+    git checkout main  # Ensure this commit exists
 
 # Copy and build application
 COPY main.go .
-RUN go build main.go
+RUN go build -o app main.go  # Explicit output name
 
-#FROM busybox:ubuntu-14.04
 FROM busybox:glibc
 LABEL purpose="utd-cnsp"
-COPY --from=builder /go//main /app/guestbook
+COPY --from=builder /go/src/app/app /app/guestbook
 
-ADD public/index.html /app/public/index.html
-ADD public/script.js /app/public/script.js
-ADD public/style.css /app/public/style.css
-ADD public/jquery.min.js /app/public/jquery.min.js
+ADD public/ /app/public/
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
