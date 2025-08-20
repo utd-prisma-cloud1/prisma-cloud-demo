@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-slave
+  labels:
+    app: redis
+    role: slave
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis
+      role: slave
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: slave
+    spec:
+      containers:
+      - name: redis-slave
+        image: us-central1-docker.pkg.dev/panw-utd-public-cloud/utd-demo-images/utd-cnsp/redis-slave:v1
+        ports:
+        - name: redis-server
+          containerPort: 6379

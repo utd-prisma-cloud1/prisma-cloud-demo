@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook-v1
+  labels:
+    app: guestbook
+    version: "1.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: guestbook
+  template:
+    metadata:
+      labels:
+        app: guestbook
+        version: "1.0"
+    spec:
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0            
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true        
+      containers:
+      - name: guestbook
+        image: us-central1-docker.pkg.dev/panw-utd-public-cloud/utd-demo-images/utd-cnsp/guestbook:v1
+        ports:
+        - name: http-server
+          containerPort: 3000
